@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  vscodeproject:
+    image: vscodeproject
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+
+#rajoués
+      ports:
+      - "5000:5000"
+      volumes:
+      - ./uploads:/app/uploads
+      - ./cleaned_data:/app/cleaned_data
