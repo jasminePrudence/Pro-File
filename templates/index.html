@@ -1,0 +1,278 @@
+<!-- index.html -->
+{% extends "base.html" %}
+
+{% block title %}Mes fichiers pro{% endblock %}
+
+{% block content %}
+<body id="page-top">
+        
+    <!-- Masthead-->
+    <header class="masthead">
+        <div class="container px-4 px-lg-5 h-100">
+            <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
+                <div class="col-lg-8 align-self-end">
+                    <h1 class="text-white font-weight-bold">Pro_Files, votre optimisateur de fichier</h1>
+                    <hr class="divider" />
+                </div>
+                <div class="col-lg-8 align-self-baseline">
+                    <p class="text-white-75 mb-5">Le traitement et l’optimisation des fichiers sont des étapes essentielles pour garantir une gestion efficace des données, améliorer la rapidité des opérations et minimiser l’espace de stockage.
+                        Comment ça marche ?<br>
+                    </p>
+                    <p class="text-white"> Comment ça marche ?</p>
+                    <p class="text-white-75 mb-5" id="text-left">
+                        🔹 Importez votre fichier<br>
+                        🔹 Sélectionnez votre fichier à traiter<br>
+                        🔹 Choisissez les traitements à appliquer:  Choisissez les options que vous souhaitez utiliser, comme la correction d'encodage, la suppression des doublons ou le nettoyage des colonnes.<br>
+                        🔹 Téléchargez votre fichier optimisé: Après le traitement, vous pouvez télécharger un fichier propre, prêt à être utilisé pour vos analyses ou autres actions.
+                    </p>
+                        <a class="btn btn-primary btn-xl" href="#services">A vous la main 🚀!</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Services-->
+    <section class="page-section" id="services">
+        <div class="container px-4 px-lg-10">
+            <h2 class="text-center mt-0">Tableau de bord </h2>
+            <hr class="divider" />
+            <div class="row gx-6 gx-lg-5">
+                <div class="col text-center">
+                    <div class="mt-5">
+                        <h3 class="h4 mb-2">Fichiers CSV</h3>
+                        <div class="mb-2"><i class="bi bi-filetype-csv fs-1 text-success"></i></div>
+                        <!-- <div class="mb-2"><i class="bi-gem fs-1 text-primary"></i></div> -->
+                        <h5 class="h4 mb-2">Notice</h5>
+                        <p class="mb-0" id="text">Gagnez du temps et améliorez la qualité de vos fichiers CSV grâce à notre outil d'optimisation. Que votre fichier contienne des erreurs d'encodage, des valeurs manquantes ou des doublons, nous vous aidons à le nettoyer et à le formater en quelques clics. La mise en forme des fichiers CSV (Comma Separated Values) est une étape essentielle pour assurer une manipulation et une analyse des données efficaces.</p>
+                        <a class="btn btn-primary btn-xl" href="{{ url_for('treatment') }}">En savoir plus!</a>
+                    </div>
+                </div>
+                <div class="col text-center">
+                    <div class="mt-5">
+                        <h3 class="h4 mb-2">Fichiers EXCEL</h3>
+                        <div class="mb-2"><i class="bi-file-earmark-excel fs-1 text-success"></i></div>
+                        <h5 class="h4 mb-2">Notice</h5>
+                        <p class="mb-0" id="text">le traitement des fichiers Excel ne se limite pas simplement à l'ouverture et à la visualisation des informations. Il joue un rôle crucial dans l'optimisation de la gestion de données complexes et volumineuses, offrant une multitude d'opportunités pour automatiser, filtrer, analyser et transformer les données de manière efficace.
+                        </p> 
+                        <button type="button" class="btn btn-primary btn-xl showModalBtn">En savoir plus!</button>
+                    </div>
+                </div>
+                <div class="col text-center">
+                    <div class="mt-5">
+                        <h3 class="h4 mb-2">Fichiers PDF</h3>
+                        <div class="mb-2"><i class="bi-file-earmark-pdf fs-1 text-primary"></i></div>
+                        <h5 class="h4 mb-2">Notice</h5>
+                        <p class="mb-0" id="text">Le traitement des fichiers PDF consiste effectuer diverses opérations telles que l'extraction de texte, la fusion, la séparation et la conversion de pages. Il facilite la manipulation et la gestion des documents PDF de manière efficace.
+                        </p>
+                        <a class="btn btn-primary btn-xl" href="{{ url_for('convert') }}">En savoir plus!</a>
+                    </div>
+                </div>
+                <div class="col text-center">
+                    <div class="mt-5">
+                        <h3 class="h4 mb-2">Fichiers XML</h3>
+                        <div class="mb-2"><i class="bi bi-file-earmark-code fs-1 text-primary"></i></div>
+                        <h5 class="h4 mb-2">Notice</h5>
+                        <p class="mb-0" id="text"> En optant pour des solutions de traitement XML, vous améliorez non seulement la flexibilité et l'évolutivité de vos données, mais vous assurez également une meilleure performance et une gestion de données plus robuste.
+                        </p>
+                        <button type="button" class="btn btn-primary btn-xl showModalBtn">En savoir plus!</button>
+                    </div>
+                </div>
+                <div class="col text-center">
+                    <div class="mt-5">
+                        <h3 class="h4 mb-2">Fichiers JSON</h3>
+                        <div class="mb-2"><i class="bi-filetype-json fs-1 text-primary"></i></div>
+                        <h5 class="h4 mb-2">Notice</h5>
+                        <p class="mb-0" id="text">Le traitement de fichier Json sur notre site permet non seulement de simplifier l’échange de données, mais également de garantir une meilleure performance et une expérience utilisateur fluide. Cela nous aide à fournir un service rapide, évolutif et fiable.
+                        </p>
+                        <button type="button" class="btn btn-primary btn-xl showModalBtn">En savoir plus!</button>
+                    </div>
+                </div>
+                <!-- Modale Bootstrap -->
+                <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="infoModalLabel">Information</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Vous avez hate? COMMING SOON !!!
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- About-->
+    <section class="page-section bg-primary" id="about">
+        <div class="container px-4 px-lg-5">
+            <div class="row justify-content-center">
+                <div class="text-center">
+                    <h2 class="mt-0">A propos du projet !</h2>
+                    <hr class="divider divider-light" /> 
+                    <p class="text-white" id="text-left">
+                        L'objectif de ce site est de proposer une solution logicielle permettant d’optimiser plusieurs types de fichiers (CSV, EXCEL, XML, etc.) en améliorant leur structuration, leur encodage et leur taille, tout en garantissant leur intégrité et leur accessibilité.<br>
+                    </p>
+                    <p>1. Contexte et Enjeux</p>
+                    <p class="text-white" id="text-left">
+                        De nombreuses entreprises et organisations manipulent quotidiennement une grande quantité de fichiers aux formats variés. Ces fichiers peuvent être mal structurés, corrompus, trop volumineux ou mal encodés, ce qui ralentit les processus métier et complique leur exploitation. Une solution automatisée et efficace est donc nécessaire pour améliorer leur gestion.<br>
+                    </p>
+                    <p>2. Objectifs du Projet</p>
+                    <p class="text-white" id="text-left">
+                        •	Optimiser et corriger les fichiers en fonction de leur format (réduction de taille, correction d'encodage, suppression de caractères spéciaux, etc.).<br>
+                        •	Assurer la compatibilité avec les standards courants pour éviter les erreurs de lecture.<br>
+                        •	Automatiser le processus pour minimiser l’intervention humaine et améliorer la productivité.<br>
+                        •	Garantir la sécurité et la fiabilité des fichiers transformés.<br> 
+                    Pour en savoir plus sur le projet, suiver ce lien  <a  href="{{ url_for('github') }}" target="_blank">Allons-y!</a>
+                    </p>
+                                           
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Portfolio-->
+    <div id="portfolio">
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                    <a class="portfolio-box" href="assets/img/portfolio/fullsize/1.jpg" title="Project Name">
+                        <div class="bande-passante">
+                            <p>Bienvenue sur notre site ! Profitez de nos services et optimisez vos fichiers en toute simplicité.</p>
+                        </div>
+                        <div class="portfolio-box-caption" onclick="this.classList.toggle('active')">
+                            <div class="project-category text-white-50">Toujours à votre service</div>
+                            <!-- <div class="project-name">Cliquez moi!</div> -->
+                        </div>
+                    </a>
+            </div>
+        </div>
+    </div>
+    <!-- Call to action-->
+    <section class="page-section bg-dark text-white">
+        <div class="container px-4 px-lg-5 text-center">
+            <h2 class="mb-4">Notre Portfolio</h2>
+            <!-- Début du Carrousel -->
+            <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/static/assets/img/carroussel/FA78BEBB.PNG" class="d-block w-100" alt="Image 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/static/assets/img/carroussel/IMG_8996.JPG" class="d-block w-100" alt="Image 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/static/assets/img/carroussel/IMG_8997.JPG" class="d-block w-100" alt="Image 3">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/static/assets/img/carroussel/IMG_9005.JPG" class="d-block w-100" alt="Image 4">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/static/assets/img/carroussel/IMG_9006.JPG" class="d-block w-100" alt="Image 5">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/static/assets/img/carroussel/IMG_9007.JPG" class="d-block w-100" alt="Image 6">
+                    </div>
+                </div>
+
+                <!-- Contrôles du carrousel (précédent et suivant) -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                </button>
+            </div>
+            <!-- Fin du Carrousel -->        
+        </div>
+    </section>
+    <!-- Contact-->
+    <section class="page-section" id="contact">
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-lg-8 col-xl-6 text-center">
+                    <h2 class="mt-0">Entrons en contact!</h2>
+                    <hr class="divider" />
+                    <p class="text-muted mb-5">Prêt à démarrer votre prochain projet avec nous? Contactez nous et nous reviendrons vers vous le plus tôt possible!</p>
+                </div>
+            </div>
+            <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+                <div class="col-lg-6">
+                    
+                    <!-- to get an API token!-->
+                    <form method="post" id="contactForm" action="/contact">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                            <div class="mt-3">
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                </div>
+                                <!-- <div class="alert alert-{{ category }}">{{ message }}</div> -->
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        {% endwith %}
+                        <!-- Nom et prénom -->
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="nom" name="nom" type="text" placeholder="Nom et prénom"/>
+                            <label for="nom">Nom et Prénom</label>
+                        </div>
+                    
+                            <!-- Email -->
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com"/>
+                            <label for="email">Adresse Email</label>
+                            <div class="invalid-feedback" id="emailError" style="display: none;">Email non valide.</div>
+                        </div>
+
+                    
+                            <!-- Téléphone -->
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="phone" name="phone" type="tel" placeholder="(123) 456-7890" pattern="^\+?[0-9\s\-\(\)]{7,15}$"/>
+                            <label for="phone">Téléphone</label>
+                            <div class="invalid-feedback" id="phoneError" style="display: none;">Numéro invalide. Exemple : +33 6 12 34 56 78</div>
+                        </div>
+                
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="message" name="message" placeholder="Votre message ici..." style="height: 10rem"></textarea>
+                            <label for="message">Saisir votre demande ici</label>
+                        </div>
+                    
+                        <!-- Bouton Envoyer -->
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-xl" id="submitButton" type="submit">Envoyer</button>
+                        </div>
+
+                        <!-- Messages de succès et d'erreur -->
+                        <div class="d-none" id="submitSuccessMessage">
+                            <div class="text-center mb-3">
+                                <div class="fw-bolder">Formulaire soumis avec succès!</div>
+                            </div>
+                        </div>
+                        <div class="d-none" id="submitErrorMessage">
+                            <div class="text-center text-danger mb-3">Erreur d'envoi du message!</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SimpleLightbox plugin JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="../static/js/scripts.js"></script>
+
+    
+ <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <!-- * *                               SB Forms JS                               * *-->
+    <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+    <!-- JavaScript pour activer le bouton lorsque tous les champs sont remplis -->
+</body>
+{% endblock %}
