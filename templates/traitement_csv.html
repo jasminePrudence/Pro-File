@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload CSV</title>
+    <title>Traitements CSV</title>
     <script src="https://cdn.jsdelivr.net/npm/jschardet@2.1.0/dist/jschardet.min.js"></script>
     <link href="../static/css/styles.css" rel="stylesheet" />
     <link href="../static/css/traitements_css.css" rel="stylesheet" />
@@ -26,7 +26,7 @@
     <div class=" align-items-center justify-content-center text-center">
         <div class="body-header">
             {% if message %}
-                <div id="error-message"><strong>{{ message }}</strong></div>
+                <div id="error-message" style="background: red; color: white; padding: 10px; border-radius: 5px;">{{ message }}</div>
             {% endif %}
         </div>
     </div>
@@ -49,7 +49,7 @@
     <div class="container2 content">               
         <div class="form-container col-lg-3 col-md-2 text-center" id="div1">
             <form action="/upload_csv" method="post" enctype="multipart/form-data">
-                <p>🛠Nettoyage de Données</p>
+                <p>🛠 Nettoyage de Données</p>
                 <input type="file" name="file" id="" required>
                 <button type="submit" name="remove_nulls">Supprimer les valeurs nulles</button>
                 <button type="submit" name="remove_duplicates">Supprimer des doublons</button>
@@ -112,4 +112,5 @@
     <script src="../static/js/scripts.js"></script>
     <script src="../static/js/traitement_csv.js"></script>
 </body>
+
 </html>

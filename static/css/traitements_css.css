@@ -38,10 +38,7 @@
     justify-content: stretch; /* Aligne les elements du conteneur à droite */
     --bs-gutter-x: 1.5rem;
     --bs-gutter-y: 0; 
-    top: 0;
-    /*margin-top: calc(-3 * var(--bs-gutter-y));
-    margin-left: calc(-3 * var(--bs-gutter-x));
-    margin-right: calc(-3 * var(--bs-gutter-x));*/   
+    top: 0;   
 }
 /* Pour les écrans de bureau standard (1024px et plus) */
 @media (min-width: 1024px) {

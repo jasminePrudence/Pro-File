@@ -5,7 +5,7 @@ body {
 }
 
 .like-button {
-    font-size: 24px;
+    font-size: 15px;
     border: none;
     background: none;
     cursor: pointer;
@@ -13,7 +13,7 @@ body {
 }
 
 .like-button.liked {
-    color: blue;
+    color: rgb(181, 246, 181);
 }
 
 .like-button:hover {

@@ -24,12 +24,24 @@
     <div class="body-header">
         <h2>Votre fichier a été traité !</h2>
         <div class="container2">
-            <a href="/download/{{ filename }}">Télécharger le fichier traité</a><br>
-
-            <p> Satisfait &#128515; ? cliquez sur <button id="likeBtn" class="like-button">👍</button><span id="likeCount" class="counter">0 J'aime</span>
+            <a href="/download/{{ filename }}" id="toggleLink">Télécharger le fichier traité</a><br>
+            <p id="hiddenText"> Satisfait &#128515; ? cliquez sur <button id="likeBtn" class="like-button">J'aime 👍 <span id="likeCount" class="counter">(0)</span></button>
+            <!-- <p> Satisfait &#128515; ? cliquez sur <button id="likeButton">J'aime👍(<span id="likeCount">0</span>)</button> -->
             </p>
         </div>
         <h3>Apercu :</h3>
+        <iframe src="{{ pdf_url }}" width="100%" height="600px"></iframe>
+        {% if extracted_text %}
+            <h2>Texte extrait :</h2>
+            <pre>{{ extracted_text }}</pre>
+        {% else %}
+            <p>Aucun texte extrait.</p>
+        {% endif %}
+        
+        {% if filename %}
+            <p>Nom du fichier : {{ filename }}</p>
+        {% endif %}
+
         {% if message %}
             <div class="alert alert-success">
                 {{ message }} {{encod}}
@@ -67,7 +79,7 @@
             </table>
             
             <!-- <h3 class="mt-4">Téléchargement du PDF Comprimé</h3> -->
-            <a href="{{ download_link }}" class="btn btn-success" download>Télécharger le PDF Compressé</a>
+            <a href="/download/{{ filename }}" class="btn btn-success" download>Télécharger le PDF Compressé</a>
         
         {% endif %} 
     </div> 

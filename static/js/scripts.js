@@ -58,16 +58,16 @@ window.addEventListener('DOMContentLoaded', event => {
 
 });
 
-// // Délai de 5 secondes (5000 ms) pour le msg succès du formulaire
-// setTimeout(function() {
-//     var alerts = document.querySelectorAll('.alert');
-//     alerts.forEach(function(alert) {
-//         alert.classList.add('fade');
-//         setTimeout(function() {
-//             alert.style.display = 'none'; // Cache le message après fade
-//         }, 500); // Délai pour la transition de disparition
-//     });
-// }, 5000); // 5 secondes
+// Délai de 5 secondes (5000 ms) pour le msg succès du formulaire
+setTimeout(function() {
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        alert.classList.add('fade');
+        setTimeout(function() {
+            alert.style.display = 'none'; // Cache le message après fade
+        }, 500); // Délai pour la transition de disparition
+    });
+}, 5000); // 5 secondes
 
 //JS validation du numéro de téléphone
 document.addEventListener("DOMContentLoaded", function () {
@@ -159,24 +159,6 @@ showModalBtns.forEach(function(button) {
     }, 5000); // 5000 ms = 5 secondes
   });
 });
-
-let likeCount = 0;
-let liked = false;
-
-document.getElementById("likeBtn").addEventListener("click", function() {
-    liked = !liked; // Alterner l'état "liké" ou non
-
-    if (liked) {
-        likeCount++;
-        this.classList.add("liked");
-    }else {
-        likeCount--;
-        this.classList.remove("liked");
-    }
-
-    document.getElementById("likeCount").textContent = likeCount;
-});
-
 
 // Lancer l'affichage progressif
 addRecord(0);
