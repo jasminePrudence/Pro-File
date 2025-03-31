@@ -59,6 +59,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
 function desactiverRequired() {
     document.getElementById("texte").removeAttribute("required");
 }
+
+document.getElementById("moved_hidden").addEventListener("click", function() {
+    document.getElementById("texte").removeAttribute("required");
+});

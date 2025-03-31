@@ -88,15 +88,28 @@ def detect_separator(file_path, encoding):
 
 #Formatage des données
 def format_names(df):
+     # Trouver les colonnes correspondantes
     nom = next((col for col in df.columns if "nom" in col.lower() or "last" in col.lower()), None)
     prenom = next((col for col in df.columns if "prénom" in col.lower() or "first" in col.lower()), None)
-    if not nom or not prenom:
-        raise KeyError("Les colonnes contenant 'Nom' ou 'Prénom' doivent être présentes dans le fichier.")
-    df[nom] = df[nom].apply(lambda x: str(x).upper() if pd.notna(x) else x)
-    df[prenom] = df[prenom].apply(lambda x: str(x).capitalize() if pd.notna(x) else x)
 
-    # Trier les données par ordre alphabétique selon "Nom" puis "Prénom"
-    df = df.sort_values(by=[nom, prenom], ascending=[True, True]).reset_index(drop=True)
+    # Vérifier si les colonnes nécessaires sont présentes
+    if not nom and not prenom:
+        raise KeyError("Les colonnes contenant 'Nom' ou 'Prénom' doivent être présentes dans le fichier.")
+
+    # Appliquer les transformations si les colonnes existent
+    if nom:
+        df[nom] = df[nom].apply(lambda x: str(x).upper() if pd.notna(x) else x)
+    if prenom:
+        df[prenom] = df[prenom].apply(lambda x: str(x).capitalize() if pd.notna(x) else x)
+
+    # Trier par Nom puis Prénom si les deux existent, sinon trier par la colonne disponible
+    if nom and prenom:
+        df = df.sort_values(by=[nom, prenom], ascending=[True, True]).reset_index(drop=True)
+    elif nom:
+        df = df.sort_values(by=[nom], ascending=[True]).reset_index(drop=True)
+    elif prenom:
+        df = df.sort_values(by=[prenom], ascending=[True]).reset_index(drop=True)
+
     return df
 
 def format_min_names(df):
