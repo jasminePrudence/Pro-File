@@ -1,6 +1,5 @@
 import chardet
 import fitz
-print(fitz.__file__)
 from flask import Flask, flash, render_template, request, send_file,  redirect, url_for, session
 import pandas as pd
 import os
@@ -8,7 +7,6 @@ from werkzeug.utils import secure_filename
 import re
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
-from flask import Flask, request, send_file
 import io
 import pymupdf
 import PIL
