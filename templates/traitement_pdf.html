@@ -18,6 +18,9 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
                     <li class="nav-item">
+                        <a class="nav-link btn btn-primary" id="bouton-clignotant" href="{{ url_for('treatment') }}">CSV</a> <!-- Aligné à droite -->
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link btn btn-primary" id="bouton-clignotant" href="{{ url_for('home') }}#services">🔙 Retour</a> <!-- Aligné à droite -->
                     </li>
                 </ul>
@@ -33,43 +36,40 @@
     </div>
     <div class="sidebar">
         <div class="text-center">
+            <div ><img src="/static/assets/img/img_pdf.png" style="width: 100px; height: 100px;"></div>
             <p class="text-white mb-0 text-left">
                 Traitement des fichiers PDF<br>
                 Le traitement des fichiers PDF consiste à manipuler, modifier ou extraire des informations d'un document au format Portable Document Format (PDF). Il peut inclure diverses opérations telles que :<br>
-                🔹 Lecture et extraction : Extraire du texte, des images ou des métadonnées d'un fichier PDF. <br>
-                🔹 Modification : Ajouter ou supprimer des pages, annoter ou modifier le contenu du fichier.<br>
-                🔹 Conversion : Transformer un PDF en d'autres formats comme Word, Excel ou image (JPEG, PNG).<br>
-                🔹 Fusion et division : Combiner plusieurs fichiers PDF en un seul ou diviser un document en plusieurs parties.<br>
+                🔹 <a class="link" data-target="div1" href="#">Optimisation fichier</a> : Compresser, Extraire du texte, des images ou des métadonnées d'un fichier.<br>
+                🔹 <a class="link" data-target="div2" href="#">Modification et extraction</a> : Ajouter du texte ou supprimer des pages du fichier. <br>
+                🔹 <a class="link" data-target="div4" href="#">Conversion</a> : Transformer un PDF en d'autres formats comme Word, Excel ou image (JPEG, PNG).<br>
+                🔹 <a class="link" data-target="div5" href="#">Fusion et division</a> : Combiner plusieurs fichiers PDF en un seul ou diviser un document en plusieurs parties.<br>
             </p>
         </div>
     </div>
     <div class="container2 content">               
-        <div class="form-container col-lg-6 col-md-2 text-center" id="myDiv">
+        <div class="form-container col-lg-6 col-md-2 text-center" id="div1">
             <form action="/compression_valide_pdf" method="post" enctype="multipart/form-data">
-                <p>Compresser le fichier PDF</p>
-                <input type="file" name="file" id="file" class="form-control" required>
-                <button type="submit" id="hideButton">Valider</button>
+                <p>Compresser ou transformer le fichier PDF</p>
                 {% if error_message %}
                     <div id="error-message" style="background: red; color: white; padding: 10px; border-radius: 5px;">{{ error_message }}</div>
                 {% endif %}
-            </form> 
-        </div>
-        <div class="form-container col-lg-3 col-md-2 text-center" id="div5">
-            <form action="/upload_pdf" method="post" enctype="multipart/form-data">
-                <p>🛠 Extraire du texte, des images ou des métadonnées du fichier</p>
-                <input type="file" id="file" name="file" accept=".pdf" multiple>
+                <input type="file" name="file" id="file" class="form-control" required>
+                <button type="submit" id="hideButton" name="action" value="compres">Valider</button>
                 <br><br>
-                <button type="submit" name="text">Extraire du texte</button>
+                <button type="submit" id="hideButton" name="action" value="extract">Extraire du texte</button>
+<!--                 
                 <button type="submit" name="image">Extraire des images</button>
-                <button type="submit" name="metadata">Extraire des métadonnées</button>
+                <button type="submit" name="metadata">Extraire des métadonnées</button> -->
             </form> 
         </div>
-        <div class="form-container col-lg-3 col-md-2 text-center" id="div5">
-            <form action="/add-text-to-pdf" method="POST" enctype="multipart/form-data" id="pdf-form" >
+        <div class="form-container col-lg-3 col-md-2 text-center" id="div2">
+            <form action="/modify-pdf" method="POST" enctype="multipart/form-data" id="pdf-form">
                 <p>Ajouter du texte à mon fichier PDF</p>
                 <input type="file" id="file" name="file" accept="application/pdf" required>
-                <textarea type="text" name="text" placeholder="Texte à ajouter" required></textarea>
-                <label for="color">Choisir la couleur du texte :</label>
+                <textarea type="text" name="text" placeholder="Texte à ajouter" id="texte" required></textarea>
+                
+                <label for="color">Choisir la couleur du texte ajouté:</label>
                 <select name="color" id="color">
                     <option value="black">Noir</option>
                     <option value="red">Rouge</option>
@@ -77,17 +77,24 @@
                     <option value="green">Vert</option>
                     <option value="purple">Violet</option>
                 </select>
-                <button type="submit">Ajouter du texte</button>
+                <button type="submit" name="action" value="add_text">Ajouter du texte</button>
+                <hr class="divider" />
+                <p>Supprimer des pages d'un PDF</p>
+                <label for="pages">Numéros des pages à supprimer (ex: 1,3,5) :</label>
+                <input type="text" name="pages" placeholder="Ex: 1,3,5">
+                <button type="submit" name="action" value="delete_pages">Supprimer des pages</button> 
+                <hr class="divider" />               
+                <button type="submit" name="action" value="both">Appliquer les deux traitements</button>
             </form>
         </div>
+<!--     
         <div class="form-container col-lg-3 col-md-2 text-center" id="div5">
             <form action="/" method="POST" enctype="multipart/form-data">
-                <p>Extraire du contenu de mon fichier PDF</p>
-                <!-- <input type="file" name="pdf_file" accept="application/pdf" required>
-                <input type="text" name="text" placeholder="Texte à ajouter" required>
-                <button type="submit">Ajouter du texte</button> -->
+                <p>Extraire du texte de mon fichier</p>
+                <input type="file" name="pdf_file" accept="application/pdf" required>
+                <button type="submit">valider</button>
             </form>
-        </div>  
+        </div>  -->
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {

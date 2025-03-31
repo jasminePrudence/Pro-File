@@ -14,10 +14,12 @@
 .sidebar {
     width: 25%;
     height: 100vh;
+    overflow-y: auto; /* Activer le scroll vertical si besoin */
+    overflow-x: hidden; /* Empêcher le scroll horizontal */
     /*background-color: #5a2a1f;*/
     background-color: rgb(143, 61, 39) !important;
     color: white;
-    padding-top: 200px;
+    padding-top: 100px;
     position: fixed;
     left: 0; /* L'aligne à gauche */
     top: 0;
@@ -95,6 +97,12 @@
     margin-top: 10px;
     padding-top: 20px;
 
+}
+@media (max-width: 600px) {
+    form {
+        width: 100%; /* Prend toute la largeur sur mobile */
+        padding: 10px;
+    }
 }
 .form-container label, .form-container input, .form-container button {
     font-size: 13px; /* Diminue la taille du texte */

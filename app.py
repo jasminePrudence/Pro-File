@@ -1,4 +1,3 @@
-from PIL import Image
 import chardet
 import fitz
 print(fitz.__file__)
@@ -10,12 +9,13 @@ import re
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 from flask import Flask, request, send_file
+import io
+import pymupdf
+from PIL import Image
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-import io
-import pymupdf
-from pdfminer.high_level import extract_text
+# from pdfminer.high_level import extract_text
 
 
 #Crée une instance de Flask
@@ -44,7 +44,7 @@ ADDED_PDF = "added_pdf_data"
 EXTRACTED_TEXT_PDF = "extracted_text_pdf_data"
 EXTRACTED_IMAGE_PDF = "extracted_image_pdf_data"
 EXTRACTED_METADATA_PDF = "extracted_metadata_pdf_data"
-
+STATIC_FOLDER = os.path.join(os.getcwd(), 'static')
 
 
 
@@ -52,7 +52,7 @@ EXTRACTED_METADATA_PDF = "extracted_metadata_pdf_data"
 for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER, FORMATTED_FOLDER, ADDED_PDF, FORMATTED_MIN_FOLDER, REMOVED_NULL_FOLDER, REMOVED_DUPLICATE_FOLDER,
                CLEANED_COLUMN_FOLDER, CLEANED_FOLDER, CHANGED_ENCODING_FOLDER, REMOVED_SPECIAL_CHARACTERS_FOLDER, COMPRESSED_FOLDER, 
                CONVERTED_EXCEL, CONVERTED_JSON, COMPRESSED_CSV, CONCATENED_FOLDER, CONVERTED_PARQUET, EXTRACTED_IMAGE_PDF, EXTRACTED_METADATA_PDF,
-               EXTRACTED_TEXT_PDF]:
+               EXTRACTED_TEXT_PDF, STATIC_FOLDER]:
     os.makedirs(folder, exist_ok=True)
 
 @app.route('/')
@@ -249,7 +249,7 @@ def upload_csv():
 
         encoding = detect_encoding(original_filepath)
         separator = detect_separator(original_filepath, encoding)
-        df = pd.read_csv(original_filepath, sep=separator, encoding=encoding, nrows=10)
+        df_preview = pd.read_csv(original_filepath, sep=separator, encoding=encoding)  # Charger tout le fichier
     # Vérifier quel bouton a été pressé et appliquer la transformation appropriée
     transformations = {
         'format_names': (format_names, FORMATTED_FOLDER, "formatted_"),
@@ -266,7 +266,7 @@ def upload_csv():
 
     for action, (func, folder, prefix) in transformations.items():
         if action in request.form:
-            df_transformed = func(df)  # Exécuter la transformation
+            df_transformed = func(df_preview)  # Exécuter la transformation
             if df_transformed is None:
                 return render_template("traitement_csv.html", message=f"La transformation '{action}' a échoué.")
 
@@ -274,11 +274,14 @@ def upload_csv():
             if isinstance(df_transformed, str):
                 return render_template("result.html", message=f"Nom de fichier généré : {df_transformed}", filename=os.path.basename(df_transformed))
             elif isinstance(df_transformed, pd.DataFrame):  # Si c'est un DataFrame
+                columns = df_preview.columns.tolist()
+                data = df_preview.values.tolist()
                 transformed_filename = f"{prefix}{file.filename}"
                 transformed_filepath = os.path.join(folder, transformed_filename)
                 df_transformed.to_csv(transformed_filepath, index=False)
+                columns = df_transformed.columns.tolist()  # Récupérer les noms de colonnes
                 data = df_transformed.values.tolist()
-                return render_template("result.html", data=data, encod=encoding, filename=transformed_filename)
+                return render_template("result.html", data=data, columns=columns, encod=encoding, filename=transformed_filename)
             else:
                 return render_template("traitement_csv.html", message=f"Erreur : '{action}' n'a pas retourné un format valide.")       
     return "Aucune action sélectionnée."
@@ -449,11 +452,13 @@ def compress_pdf_file(input_path, quality=50, dpi=100):
 @app.route("/compression_valide_pdf", methods=["GET", "POST"])
 def compress_pdf():
     if request.method == "POST":
+
         if "file" not in request.files:
             session["error_message"] = "Aucun fichier sélectionné."
             return redirect(url_for("compress_pdf"))
 
         file = request.files["file"]
+        action = request.form.get("action")  # Récupérer le bouton cliqué
         filename = secure_filename(file.filename)
         orig_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(orig_path)
@@ -462,19 +467,27 @@ def compress_pdf():
             result = compress_pdf_file(orig_path)
             output_path, compressed_filename, orig_size, compressed_size, ratio = result
 
-            if ratio >= 100:
-                session["error_message"] = "Compression inefficace : Le fichier compressé est plus grand ou égal à l'original."
-                return redirect(url_for("compress_pdf"))
+            
+            if action == "extract":
+                text_path = extract_text_from_pdf(orig_path)
+                text_name = os.path.basename(text_path)
 
-            return render_template(
-                "result.html",
-                filename=compressed_filename,
-                orig_size=orig_size,
-                compressed_size=compressed_size,
-                ratio=f"{ratio:.2f}%",
-                compressed_path=output_path,
-                ratio_class="green"
-            )
+                # Renvoyer un lien pour télécharger le texte extrait
+                return render_template("result.html", text_filename=text_name, text_path=text_path)
+            if action == "compres":
+                if ratio >= 100:
+                    session["error_message"] = "Compression inefficace : Le fichier compressé est plus grand ou égal à l'original."
+                    return redirect(url_for("compress_pdf"))
+                else:
+                    return render_template(
+                        "result.html",
+                        filename=compressed_filename,
+                        orig_size=orig_size,
+                        compressed_size=compressed_size,
+                        ratio=f"{ratio:.2f}%",
+                        compressed_path=output_path,
+                        ratio_class="green"
+                    )
 
         except ValueError:
             session["error_message"] = "Erreur : Le fichier n'est pas un PDF valide."
@@ -483,99 +496,229 @@ def compress_pdf():
     # Récupère et supprime le message d'erreur de la session après affichage
     error_message = session.pop("error_message", None)
     return render_template("traitement_pdf.html", error_message=error_message)
-# # Création d'une image test
-# img = Image.new("RGB", (100, 100), color="red")
-# img_bytes = io.BytesIO()
-# img.save(img_bytes, format="JPEG")
 
-# # Réouverture de l'image
-# img_bytes.seek(0)
-# img_test = Image.open(img_bytes)
-# img_test.show()
+
+#############################################Extraction du texte, d'images, des métadonnées d'un pdf
+
+def extract_text_from_pdf(pdf_path):
+    """Extrait le texte d'un PDF et l'enregistre dans un fichier .txt"""
+    doc = fitz.open(pdf_path)
+    text = "\n".join([page.get_text("text") for page in doc])
+
+ # Créer un fichier texte avec le même nom que le PDF dans le répertoire static
+    text_filename = os.path.basename(pdf_path).replace(".pdf", ".txt")
+    text_path = os.path.join(STATIC_FOLDER, text_filename)  # Sauvegarde dans le répertoire static
+
+    with open(text_path, "w", encoding="utf-8") as f:
+        f.write(text)
+
+    return text_path  # Retourne le chemin du fichier texte
+
+# def extract_images_from_pdf(pdf_path):
+#     doc = fitz.open(pdf_path)
+#     images = []
+#     for page_num in range(doc.page_count):
+#         page = doc.load_page(page_num)
+#         image_list = page.get_images(full=True)
+
+#         for img in image_list:
+#             xref = img[0]
+#             base_image = doc.extract_image(xref)
+#             image_bytes = base_image["image"]
+
+#             # Convertir l'image en format PIL
+#             image = Image.open(io.BytesIO(image_bytes))
+#             images.append(image)
+#     return images
+
+    # # Sauvegarder les images extraites
+    # for i, img in enumerate(images):
+    #     img.save(f"image_{i}.png")
+
+# def extract_metadata_from_pdf(pdf_path):
+#     doc = fitz.open(pdf_path)
+#     metadata = doc.metadata
+#     return metadata
+
+# def extract_text_from_pdf(pdf_path):
+#    # Ouvrir le document PDF
+#     doc = fitz.open(pdf_path)
+#     text = ""
+
+#     # Parcourir chaque page du PDF
+#     for page_num in range(doc.page_count):
+#         page = doc.load_page(page_num)  # Charger la page
+#         try:
+#             # Essayer d'extraire le texte
+#             page_text = page.get_text("text")
+#             text += page_text
+#         except Exception as e:
+#             # Capturer toute erreur d'encodage ou autre
+#             print(f"Erreur lors de l'extraction du texte de la page {page_num + 1}: {e}")
+
+#     # Fermer le document PDF après l'extraction
+#     doc.close()
+
+#     return text
+############################################Cette route reçoit un fichier pdf
+# @app.route('/upload_pdf', methods=['POST'])
+# def upload_pdf():
+#     if 'file' not in request.files:
+#         return render_template("traitement_pdf.html", message="Aucun fichier sélectionné.")
+    
+#     file = request.files['file']
+    
+#     # Vérifier si le fichier est un PDF
+#     if file and file.filename.endswith(".pdf"):
+#         filename = secure_filename(file.filename)
+#         original_filepath = os.path.join(UPLOAD_FOLDER, filename)
+#         file.save(original_filepath)
+
+#         # Vérifier quel bouton a été pressé et appliquer la transformation appropriée
+#         transformations = {
+#             'text': (extract_text_from_pdf, EXTRACTED_TEXT_PDF, "extracted_text_"),
+#             'image': (extract_images_from_pdf, EXTRACTED_IMAGE_PDF, "extracted_img_"),
+#             'metadata': (extract_metadata_from_pdf, EXTRACTED_METADATA_PDF, "extracted_metadata_"),
+#         }
+
+#         # Parcours de chaque transformation possible
+#         for action, (func, folder, prefix) in transformations.items():
+#             if action in request.form:
+#                 # Appliquer la transformation
+#                 extracted_data = func(original_filepath)  # Appeler la fonction d'extraction
+
+#                 if extracted_data is None:
+#                     return render_template("traitement_pdf.html", message=f"La transformation '{action}' a échoué.")
+                
+#                 # Si la transformation demande de retourner du texte extrait
+#                 if action == 'text':
+#                     return render_template("result.html", extracted_text=extracted_data, filename=filename)
+
+#                 # Si c'est un fichier ou un DataFrame
+#                 if isinstance(extracted_data, str):  # Fichier généré
+#                     return render_template("result.html", message=f"Nom de fichier généré : {extracted_data}", filename=os.path.basename(extracted_data))
+#                 elif isinstance(extracted_data, pd.DataFrame):  # Si c'est un DataFrame
+#                     transformed_filename = f"{prefix}{file.filename}"
+#                     transformed_filepath = os.path.join(folder, transformed_filename)
+#                     extracted_data.to_csv(transformed_filepath, index=False)
+#                     data = extracted_data.values.tolist()
+#                     return render_template("result.html", data=data, filename=transformed_filename)
+#                 else:
+#                     return render_template("traitement_pdf.html", message=f"Erreur : '{action}' n'a pas retourné un format valide.")
+        
+#         return "Aucune action sélectionnée."
+
 
 ############################################# Ajouter du texte au pdf
 
 def add_text_to_pdf_file(input_path, text, page_number=-1, font_size=12, color=(0, 0, 0)):
-    """Ajoute du texte à la ligne suivant le dernier mot de la page, juste avant le footer."""
-
+    """Ajoute du texte juste avant le footer, après le dernier mot de la page spécifiée."""
+    
     doc = fitz.open(input_path)  
-    output_path = os.path.join(ADDED_PDF, os.path.basename(input_path))
-    added_filename = os.path.basename(output_path)
-
-    # Si aucun numéro de page n'est précisé, ajouter le texte à la dernière page
+    output_path = os.path.join(ADDED_PDF, "added_" + os.path.basename(input_path))
+    
+    # Définir la page cible (dernière page par défaut)
     if page_number == -1:
         page_number = len(doc) - 1  
-
-    # Vérifier si la page demandée existe
     if page_number < 0 or page_number >= len(doc):
         raise ValueError(f"Le PDF contient {len(doc)} pages. Impossible d'ajouter du texte à la page {page_number + 1}.")
 
-    page = doc[page_number]  # Charger la page demandée
+    page = doc[page_number]
 
-    # Extraire le texte existant sous forme de blocs
-    blocks = page.get_text("blocks")  # Récupère les blocs de texte (contenu et positions)
+    # Récupérer la hauteur de la page pour positionner le texte
+    footer_margin = 50
+    page_height = page.rect.height  
 
-    footer_margin = 50  # La marge avant le footer, ajustez si nécessaire
-    page_height = page.rect.height  # Hauteur totale de la page
-
+    # Trouver la position du dernier bloc de texte
+    blocks = page.get_text("blocks")  
     if blocks:
-        # Trouver la dernière ligne de texte
-        last_block = sorted(blocks, key=lambda b: (b[1], b[0]))[-1]  # Trier par position Y puis X
-        x, y = last_block[0], last_block[3]  # X reste le même, Y est la position en bas du bloc
-
-        # Ajouter un petit espace sous le dernier texte
-        y += font_size + 5  # Décalage de quelques pixels
-
-        # Si la position Y du dernier texte est trop proche du footer, ajuster
+        last_block = sorted(blocks, key=lambda b: (b[1], b[0]))[-1]
+        x, y = last_block[0], last_block[3] + font_size + 5  
         if y + font_size > page_height - footer_margin:
-            y = page_height - footer_margin - font_size - 5  # Placer un peu au-dessus du footer
+            y = page_height - footer_margin - font_size - 5  
     else:
-        # Si aucun texte trouvé, placer le texte en bas de la page
-        x, y = 50, page.rect.height - footer_margin - font_size
+        x, y = 50, page.rect.height - footer_margin - font_size  
 
-    # Ajouter le texte avec la couleur spécifiée
+    # Ajouter le texte
     page.insert_text((x, y), text, fontsize=font_size, color=color)
 
-    # Sauvegarde du fichier
     doc.save(output_path)
     doc.close()
+    return output_path, os.path.basename(output_path)
 
-    return output_path, added_filename
-
-@app.route('/add-text-to-pdf', methods=['POST'])
-def add_text():
-    if "file" not in request.files or "text" not in request.form:
-        return "Veuillez sélectionner un fichier PDF et saisir du texte."
-
-    file = request.files["file"]
-    text = request.form["text"]
-    color = request.form.get("color", "black")  # Récupérer la couleur du texte, défaut = noir
-    filename = secure_filename(file.filename)
-
-    if not filename.lower().endswith(".pdf"):
-        return "Veuillez sélectionner un fichier PDF."
-
-    input_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(input_path)
-
-  # Convertir la couleur sélectionnée en valeurs RGB
-    color_dict = {
-        "black": (0, 0, 0),
-        "red": (1, 0, 0),
-        "blue": (0, 0, 1),
-        "green": (0, 1, 0),
-        "purple": (0.5, 0, 0.5)
-    }
-    selected_color = color_dict.get(color, (0, 0, 0))  # Par défaut, noir
-
-    # Ajouter du texte au PDF
+@app.route('/modify-pdf', methods=['POST'])
+def modify_pdf():
     try:
-        output_path, added_filename = add_text_to_pdf_file(input_path, text, color=selected_color)
-        return render_template("result.html", filename=added_filename, output_path=output_path, pdf_url=f"/view-pdf/{added_filename}"  # URL du PDF modifié
-        )
+        file = request.files.get("file")
+        text = request.form.get("text")
+        color = request.form.get("color", "black")
+        pages_to_delete = request.form.get("pages")
+        action = request.form.get("action")  # Récupérer le bouton cliqué
+
+        if not file:
+            return "Veuillez sélectionner un fichier PDF.", 400
+
+        filename = secure_filename(file.filename)
+        if not filename.lower().endswith(".pdf"):
+            return "Veuillez sélectionner un fichier PDF.", 400
+
+        input_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(input_path)
+
+        # Dictionnaire des couleurs
+        color_dict = {
+            "black": (0, 0, 0),
+            "red": (1, 0, 0),
+            "blue": (0, 0, 1),
+            "green": (0, 1, 0),
+            "purple": (0.5, 0, 0.5)
+        }
+        selected_color = color_dict.get(color, (0, 0, 0))
+
+        removed_pdf_path = None
+        added_pdf_path = None
+
+        # 🔹 Suppression des pages (si demandée)
+        if action in ["delete_pages", "both"] and pages_to_delete:
+            pages_to_delete = [int(p) - 1 for p in pages_to_delete.split(",") if p.strip().isdigit()]
+            reader = PdfReader(input_path)
+            writer = PdfWriter()
+
+            for i in range(len(reader.pages)):
+                if i not in pages_to_delete:
+                    writer.add_page(reader.pages[i])
+
+            removed_pdf_path = os.path.join(ADDED_PDF, "modified_" + filename)
+            with open(removed_pdf_path, "wb") as output_pdf:
+                writer.write(output_pdf)
+
+        # 🔹 Ajout du texte (si demandé)
+        if action in ["add_text", "both"] and text:
+            pdf_to_edit = removed_pdf_path if removed_pdf_path else input_path
+            added_pdf_path, added_filename = add_text_to_pdf_file(pdf_to_edit, text, color=selected_color)
+
+        # 🔹 Renvoyer le bon fichier selon l’action choisie
+        if action == "add_text" and added_pdf_path:
+            return render_template("result.html", added_filename=added_filename, added_pdf_url=f"/view-pdf/{added_filename}")
+
+        if action == "delete_pages" and removed_pdf_path:
+            removed_filename=os.path.basename(removed_pdf_path)
+            return render_template("result.html", removed_filename=removed_filename, removed_pdf_url=f"/view-pdf/{os.path.basename(removed_pdf_path)}")
+
+        if action == "both" and added_pdf_path:
+            return render_template(
+                "result.html",
+                # removed_and_add_filename=os.path.basename(removed_pdf_path),
+                # removed_pdf_url=f"/view-pdf/{os.path.basename(removed_pdf_path)}",
+                added_filename=added_filename,
+                added_pdf_url=f"/view-pdf/{added_filename}"
+            )
+
+        return "Aucune modification n'a été effectuée.", 400
+
     except Exception as e:
         return f"Erreur lors du traitement du fichier : {str(e)}", 500
-
+        
 #######################################afficher l'apercu du pdf
 @app.route('/view-pdf/<filename>')
 def view_pdf(filename):
@@ -583,108 +726,13 @@ def view_pdf(filename):
     return send_file(file_path, mimetype='application/pdf')
 
 
-#############################################Extraction du texte, d'images, des métadonnées d'un pdf
-
-
-def extract_images_from_pdf(pdf_path):
-    doc = fitz.open(pdf_path)
-    images = []
-    for page_num in range(doc.page_count):
-        page = doc.load_page(page_num)
-        image_list = page.get_images(full=True)
-
-        for img in image_list:
-            xref = img[0]
-            base_image = doc.extract_image(xref)
-            image_bytes = base_image["image"]
-
-            # Convertir l'image en format PIL
-            image = Image.open(io.BytesIO(image_bytes))
-            images.append(image)
-    return images
-
-    # # Sauvegarder les images extraites
-    # for i, img in enumerate(images):
-    #     img.save(f"image_{i}.png")
-
-def extract_metadata_from_pdf(pdf_path):
-    doc = fitz.open(pdf_path)
-    metadata = doc.metadata
-    return metadata
-
-def extract_text_from_pdf(pdf_path):
-   # Ouvrir le document PDF
-    doc = fitz.open(pdf_path)
-    text = ""
-
-    # Parcourir chaque page du PDF
-    for page_num in range(doc.page_count):
-        page = doc.load_page(page_num)  # Charger la page
-        try:
-            # Essayer d'extraire le texte
-            page_text = page.get_text("text")
-            text += page_text
-        except Exception as e:
-            # Capturer toute erreur d'encodage ou autre
-            print(f"Erreur lors de l'extraction du texte de la page {page_num + 1}: {e}")
-
-    # Fermer le document PDF après l'extraction
-    doc.close()
-
-    return text
-############################################Cette route reçoit un fichier pdf
-@app.route('/upload_pdf', methods=['POST'])
-def upload_pdf():
-    if 'file' not in request.files:
-        return render_template("traitement_pdf.html", message="Aucun fichier sélectionné.")
-    
-    file = request.files['file']
-    
-    # Vérifier si le fichier est un PDF
-    if file and file.filename.endswith(".pdf"):
-        filename = secure_filename(file.filename)
-        original_filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(original_filepath)
-
-        # Vérifier quel bouton a été pressé et appliquer la transformation appropriée
-        transformations = {
-            'text': (extract_text_from_pdf, EXTRACTED_TEXT_PDF, "extracted_text_"),
-            'image': (extract_images_from_pdf, EXTRACTED_IMAGE_PDF, "extracted_img_"),
-            'metadata': (extract_metadata_from_pdf, EXTRACTED_METADATA_PDF, "extracted_metadata_"),
-        }
-
-        # Parcours de chaque transformation possible
-        for action, (func, folder, prefix) in transformations.items():
-            if action in request.form:
-                # Appliquer la transformation
-                extracted_data = func(original_filepath)  # Appeler la fonction d'extraction
-
-                if extracted_data is None:
-                    return render_template("traitement_pdf.html", message=f"La transformation '{action}' a échoué.")
-                
-                # Si la transformation demande de retourner du texte extrait
-                if action == 'text':
-                    return render_template("result.html", extracted_text=extracted_data, filename=filename)
-
-                # Si c'est un fichier ou un DataFrame
-                if isinstance(extracted_data, str):  # Fichier généré
-                    return render_template("result.html", message=f"Nom de fichier généré : {extracted_data}", filename=os.path.basename(extracted_data))
-                elif isinstance(extracted_data, pd.DataFrame):  # Si c'est un DataFrame
-                    transformed_filename = f"{prefix}{file.filename}"
-                    transformed_filepath = os.path.join(folder, transformed_filename)
-                    extracted_data.to_csv(transformed_filepath, index=False)
-                    data = extracted_data.values.tolist()
-                    return render_template("result.html", data=data, filename=transformed_filename)
-                else:
-                    return render_template("traitement_pdf.html", message=f"Erreur : '{action}' n'a pas retourné un format valide.")
-        
-        return "Aucune action sélectionnée."
-
 ##################################################Téléchargement du fichier nettoyé (/download/<filename>)
 @app.route('/download/<filename>')
 def download_file(filename):
     # Vérifie dans quel dossier le fichier existe
-    for folder in [FORMATTED_FOLDER, OUTPUT_FOLDER, ADDED_PDF, REMOVED_NULL_FOLDER, REMOVED_DUPLICATE_FOLDER, CLEANED_COLUMN_FOLDER, CLEANED_FOLDER, REMOVED_SPECIAL_CHARACTERS_FOLDER, CHANGED_ENCODING_FOLDER, COMPRESSED_FOLDER, CONVERTED_EXCEL, CONVERTED_JSON, COMPRESSED_CSV, CONCATENED_FOLDER, CONVERTED_PARQUET, FORMATTED_MIN_FOLDER]:
+    for folder in [FORMATTED_FOLDER, OUTPUT_FOLDER, ADDED_PDF, REMOVED_NULL_FOLDER, REMOVED_DUPLICATE_FOLDER, CLEANED_COLUMN_FOLDER,
+    CLEANED_FOLDER, REMOVED_SPECIAL_CHARACTERS_FOLDER, CHANGED_ENCODING_FOLDER, COMPRESSED_FOLDER, CONVERTED_EXCEL, CONVERTED_JSON, 
+    COMPRESSED_CSV, CONCATENED_FOLDER, CONVERTED_PARQUET, FORMATTED_MIN_FOLDER, STATIC_FOLDER, UPLOAD_FOLDER]:
         filepath = os.path.join(folder, filename)
         if os.path.exists(filepath):
             return send_file(filepath, as_attachment=True)

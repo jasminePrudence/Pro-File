@@ -17,6 +17,9 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
                     <li class="nav-item">
+                        <a class="nav-link btn btn-primary" id="bouton-clignotant" href="{{ url_for('convert') }}">PDF</a> <!-- Aligné à droite -->
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link btn btn-primary" id="bouton-clignotant" href="{{ url_for('home') }}#services">🔙 Retour</a> <!-- Aligné à droite -->
                     </li>
                 </ul>
@@ -30,8 +33,10 @@
             {% endif %}
         </div>
     </div>
+
     <div class="sidebar">
         <div class="text-center">
+            <div ><img src="/static/assets/img/img_csv.png" style="width: 100px; height: 100px;"></div>
             <p class="text-white mb-0 text-left">
                 📂 Importez simplement votre fichier CSV, sélectionnez les optimisations souhaitées et téléchargez un fichier propre et exploitable !<br>
                 

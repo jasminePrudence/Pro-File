@@ -45,8 +45,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Vérifie si l'iframe est bien chargé
     iframe.addEventListener("load", function() {
-        if (iframe.src && iframe.src !== "about:blank") {
+        if (iframe.src && iframe.src !== "about:blank"){
             downloadLink.style.display = "none"; // Cache le lien de téléchargement
         }
     });
+});
+
+//masquer le lien de téléchargemnet s'il s'agit de la compression
+document.addEventListener("DOMContentLoaded", function() {
+    var link = document.getElementById("link");
+    var downloadLink = document.getElementById("toggleLink");
+    if (link) { // Vérifie si l'élément 'link' existe
+        downloadLink.style.display = "none"; // Cache 'downloadLink'
+    }
 });

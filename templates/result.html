@@ -22,7 +22,7 @@
         </div>
     </nav>
     <div class="body-header">
-        <h2>Votre fichier a été traité !</h2>
+        <h2>Fichier traité avec succès !</h2>
         <div class="container2">
             <a href="/download/{{ filename }}" id="toggleLink">Télécharger le fichier traité</a><br>
             <p id="hiddenText"> Satisfait &#128515; ? cliquez sur <button id="likeBtn" class="like-button">J'aime 👍 <span id="likeCount" class="counter">(0)</span></button>
@@ -30,17 +30,33 @@
             </p>
         </div>
         <h3>Apercu :</h3>
-        <iframe src="{{ pdf_url }}" width="100%" height="600px"></iframe>
-        {% if extracted_text %}
+        {% if added_filename %}
+            <p>Nom du fichier : {{ added_filename }}</p>
+            <iframe src="{{ added_pdf_url }}" width="100%" height="600px"></iframe>
+        {% endif %}
+        {% if removed_filename %}
+            <p>Nom du fichier : {{ removed_filename }}</p>
+            <iframe src="{{ removed_pdf_url }}" width="100%" height="600px"></iframe>
+        {% endif %}
+        {% if removed_and_add_filename %}
+            <p>Nom du fichier : {{ removed_and_add_filename }}</p>
+            <iframe src="{{ removed_pdf_url }}" width="800px" height="600px"></iframe>
+        {% endif %}
+        {% if text_filename %}
+            <p>Nom du fichier : {{ text_filename }}<br>
+            <a href="/download/{{ text_filename }}">Télécharger le fichier traité</a>
+            </p>
+            <iframe src="{{ url_for('static', filename=text_filename) }}" width="700px" height="600px"></iframe>
+        {% endif %}
+
+        <!-- {% if extracted_text %}
             <h2>Texte extrait :</h2>
             <pre>{{ extracted_text }}</pre>
         {% else %}
             <p>Aucun texte extrait.</p>
-        {% endif %}
+        {% endif %} -->
         
-        {% if filename %}
-            <p>Nom du fichier : {{ filename }}</p>
-        {% endif %}
+        
 
         {% if message %}
             <div class="alert alert-success">
@@ -48,14 +64,23 @@
             </div>
         {% endif %}
         
-        {% if data %}
-            {% if data|length > 0 %}
+        {% if columns %}
+            <table border="1">
+                <tr>
+                    {% for col in columns %}
+                        <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
                 {% for record in data %}
-                    <li>{{ record | join(' , ') }}</li>
+                    <tr>
+                        {% for value in record %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
-            {% else %}
-                <p>Aucun contenu à afficher.</p>
-            {% endif %}    
+            </table>
+        {% else %}
+            <p>Aucune donnée disponible.</p>
         {% endif %}
         {% if orig_size %}     
             <h2 class="mt-4 text-muted">Détails de la compression</h2>
@@ -79,9 +104,8 @@
             </table>
             
             <!-- <h3 class="mt-4">Téléchargement du PDF Comprimé</h3> -->
-            <a href="/download/{{ filename }}" class="btn btn-success" download>Télécharger le PDF Compressé</a>
-        
-        {% endif %} 
+            <a href="/download/{{ filename }}" class="btn btn-success" download id="link">Télécharger le PDF Compressé</a>
+       {% endif %} 
     </div> 
     <script src="../static/js/scripts.js"></script>
     <script src="../static/js/result.js"></script>

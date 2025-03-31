@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     const links = document.querySelectorAll(".link");
     let activeDiv = null; // Stocke la div actuellement surlignée

@@ -3,14 +3,16 @@
     "configurations": [
         {
             "name": "Python: Flask",
-            "type": "debugpy-old",
+            "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/app.py",
             "env": {
                 "FLASK_APP": "app.py",
                 "FLASK_ENV": "development"
             },
-            "jinja": true
+            "jinja": true,
+            "console": "integratedTerminal"  // Ajoute cette ligne pour utiliser le terminal intégré de VSCode
+
         }
     ]
     // "configurations": [

@@ -1,0 +1,108 @@
+ 
+Jasmine TATANG TAKAM 
+Data Engineer en formation 
+  Disponible dans l’immediat 
+Coordonnées 
+Adresses : 49000 Angers 
+44000 Nantes 
+75000 Paris 
+Couriel : Jasmine.tatang@gmail.com 
+LinkedIn: 
+https://www.linkedin.com/in/jasmine-
+tatang-takam 
+Permis B 
+Tel: 0627141566 
+ 
+ Je suis actuellement à la recherche d’une entreprise pour suivre 
+une formation en Alternance en tant que Data Engineer avec 
+l’école DataScientest, rentrée de Mars ou Septembre 2025.  
+Rythme : 3 semaines en entreprise / 1 semaine en formation.  
+Mobilité : Pays de la Loire et Île-de-France 
+Compétences 
+Gestion des données 
+ -Langages : Python, Java, Scala, SQL  
+-Big Data: Spark, Hadoop, Kafka, Hive  
+-Cloud: AWS, Google BigQuery  
+-Outils ETL: Apache Airflow, Talend  
+-Outils DevOps : Docker, Kubernetes  
+Conception 
+UML, MCD, PowerDesigner 
+Développement 
+ Java, Spring Boot, Eclipse, JavaScript, 
+Angular, VisualStudio Code, Jquery  
+C#, ASP.Net, CodeIgniter, Android 
+studio,  
+ PHP, Symfony, Entity framework 
+ 
+Versionning 
+SVN, Git 
+Bases de données 
+   Oracle, MySQL, PostgreSQL  
+   MongoDB, Snowflake, NoSQL 
+ 
+Formation 
+ 
+ Mars 2025–Mars 2026 – Data Engineer en formation / DataScientest  
+Titre RNCP de niveau 7 
+Sept – Dec 2024 – IBM Data Engineering / Coursera 
+Certificat professionnel, Obtenu  
+2024 – Concepteur Développeur d’Applications / ENI Ecole Informatique 
+Saint-Herblain, Titre RNCP de niveau 6 - Bac+4, Obtenu 
+2021 – Développeur Web et Web Mobile / ENI Ecole Informatique Saint 
+Herblain, Titre RNCP de niveau 5 - Bac+2, Obtenu 
+2017 – Master 2 en Marketing / Université de Dschang, Cameroun 
+Expériences professionnelles 
+Sept 2022 – Juil 2023 
+Conceptrice développeuse d'applications, gestion des données / 
+LDC Services, Sablé-Sur-Sarthe 
+Conduite du projet U2 de restructuration des profils et droits utilisateurs en 
+utilisant la méthodologie agile Scrum 
+• 
+Élaboration de la planification avec la matrice PBS. 
+• 
+Modélisation UML via PowerDesigner et développement de la base de 
+données Oracle avec SQL Developer. 
+• 
+Mise en œuvre des processus ETL à partir de fichiers CSV et Excel, ainsi 
+que traitement de données en Java. 
+• 
+Développement et paramétrage Front (Java et JavaScript) sur 
+l'application interne. 
+• 
+Réalisation de tests unitaires et fonctionnels, suivi du déploiement sur 
+Linux. 
+ 
+Juin 2021 – Juil 2021 
+Développeuse d’application / LogoSapience, Angers 
+Intégration du module de visioconférence 'Tutorat en direct' à une plateforme 
+éducative numérique, optimisant l'engagement utilisateur et l'accessibilité 
+• 
+Développement Agile en méthodologie SCRUM, maîtrisant des 
+technologies avancées : PHP, JavaScript, CodeIgniter, DevExtreme, 
+WebRTC, PostgreSQL 12 
+Sept 2019 – Nov 2020 
+Operatrice de production / VALEO Système de Contrôle moteur, Sablé-
+Sur-Sarthe 
+• 
+Validation de la conformité des pièces produites sur ligne selon les 
+normes CMS. 
+• 
+Maîtrise du siliconage des power blocks alternateurs et de l'assemblage à 
+la chaîne sur ligne de production. 
+Oct 2013 – Nov 20216 
+Conseillère clientèle bancaire / Afriland First Bank, Cameroun 
+• 
+Gestion des comptes bancaires, des dossiers de crédits, vente des produits 
+spécifiques et de banque-assurance Saar-SM ;  
+• 
+Etude de la satisfaction de la clientèle. 
+Activités 
+Chant : Choriste des Choeurs de Saint 
+Maur à Angers, Animatrice paroisse St 
+Laud Angers et Sablé-Sur-Sarthe ; 
+Musique : Ecole de musique le 
+Virtuose - Concept et orchestre la 
+Symphonie du Cameroun ; 
+Sport : Tennis, 2010-2012, membre de 
+l'équipe de Jeux universitaires de 
+l'université de Dschang-Cameroun 
