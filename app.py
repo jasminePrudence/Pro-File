@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_file
 import io
 import pymupdf
+import PIL
 from PIL import Image
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
