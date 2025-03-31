@@ -17,7 +17,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 # from pdfminer.high_level import extract_text
 
-
 #Crée une instance de Flask
 app = Flask(__name__)
 app.secret_key = "secretkey"  # Nécessaire pour utiliser `session`
