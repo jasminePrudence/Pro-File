@@ -59,3 +59,12 @@ document.addEventListener("DOMContentLoaded", function() {
         downloadLink.style.display = "none"; // Cache 'downloadLink'
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const hiddenText = document.getElementById("hiddenText");
+    const downloadLink = document.querySelector("p a[href^='/download/']");
+
+    if (downloadLink) {
+        hiddenText.style.display = "none";
+    }
+});

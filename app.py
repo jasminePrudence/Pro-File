@@ -234,7 +234,9 @@ def compress_csv():
             compressed_path, compressed_filename, orig_size, compressed_size, ratio = compress_csv_file(orig_path)
             # Si le ratio est >= 100%, on ne compresse pas et on affiche un message
             if ratio >= 100:
-                return render_template("traitement_csv.html", message="Compression inefficace : Le fichier compressé est plus grand ou égal à l'original.")
+                session["error_message"] = "Compression inefficace : Le fichier compressé est plus grand ou égal à l'original."
+
+                return render_template("traitement_csv.html", message=error_message)
             return render_template(
                 "result.html",
                 filename=compressed_filename,
@@ -245,14 +247,16 @@ def compress_csv():
                 ratio_class="green"  # Passer la classe dynamique
             )
         except ValueError:
-            return render_template("traitement_csv.html", message="Erreur : Le fichier n'est pas un CSV valide.")
+            session["error_message"] = "Erreur : Le fichier n'est pas un CSV valide."
+            return render_template("traitement_csv.html", message=error_message)
     return render_template("traitement_csv.html")
 
 ############################################Cette route reçoit un fichier CSV
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():   
     if 'file' not in request.files:
-        return render_template("traitement_csv.html", message="Aucun fichier sélectionné.")        
+        session["error_message"] = "Aucun fichier sélectionné."
+        return render_template("traitement_csv.html", message=error_message)        
     file = request.files['file']
     if file and file.filename.endswith(".csv"):
         filename = secure_filename(file.filename)
@@ -379,12 +383,12 @@ def concat_csv():
         # Si le premier élément est None (erreur), alors afficher le message d'erreur
         return render_template("traitement_csv.html", message=result[1])
     # Si tout va bien, on récupère les trois valeurs retournées
-    df, success_message, new_path = result
-    data = df.sort_values(by=df.columns[0])
+    df_all, success_message, new_path = result
+    data = df_all.sort_values(by=df_all.columns[0])
     
-    if df is None:
+    if df_all is None:
         return render_template("traitement_csv.html", message="La transformation a retourné None.")
-    if not isinstance(df, pd.DataFrame):
+    if not isinstance(df_all, pd.DataFrame):
         return render_template("traitement_csv.html", message="Erreur : n'a pas retourné un DataFrame valide.")
     return render_template('result.html', data=data.values.tolist(), message=success_message, filename=os.path.basename(new_path))
 
@@ -689,17 +693,35 @@ def modify_pdf():
         removed_pdf_path = None
         added_pdf_path = None
 
-        # 🔹 Suppression des pages (si demandée)
+        # Suppression des pages (si demandée)
         if action in ["delete_pages", "both"] and pages_to_delete:
-            pages_to_delete = [int(p) - 1 for p in pages_to_delete.split(",") if p.strip().isdigit()]
             reader = PdfReader(input_path)
-            writer = PdfWriter()
+            total_pages = len(reader.pages)
 
-            for i in range(len(reader.pages)):
+            # Convertir les pages à supprimer en indices valides
+            pages_to_delete = [
+                int(p) - 1 for p in pages_to_delete.split(",") if p.strip().isdigit()
+            ]
+
+            # Filtrer les pages à supprimer pour ne garder que celles existant dans le document
+            pages_to_delete = [p for p in pages_to_delete if 0 <= p < total_pages]
+
+             # Gestion des cas particuliers
+            if not pages_to_delete:
+                session["error_message"] = "Aucune des pages spécifiées n'existe dans le document."
+                return render_template("traitement_pdf.html", message=session["error_message"])
+
+            if total_pages == 1 and pages_to_delete == [0]:
+                session["error_message"] = "Impossible de supprimer la seule page du document."
+                return render_template("traitement_pdf.html", message=session["error_message"])
+
+            # Création du fichier sans les pages supprimées
+            writer = PdfWriter()
+            for i in range(total_pages):
                 if i not in pages_to_delete:
                     writer.add_page(reader.pages[i])
 
-            removed_pdf_path = os.path.join(ADDED_PDF, "modified_" + filename)
+            removed_pdf_path = os.path.join(ADDED_PDF, f"modified_{filename}")
             with open(removed_pdf_path, "wb") as output_pdf:
                 writer.write(output_pdf)
 
@@ -719,8 +741,6 @@ def modify_pdf():
         if action == "both" and added_pdf_path:
             return render_template(
                 "result.html",
-                # removed_and_add_filename=os.path.basename(removed_pdf_path),
-                # removed_pdf_url=f"/view-pdf/{os.path.basename(removed_pdf_path)}",
                 added_filename=added_filename,
                 added_pdf_url=f"/view-pdf/{added_filename}"
             )

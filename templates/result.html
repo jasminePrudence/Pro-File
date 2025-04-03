@@ -63,7 +63,7 @@
                 {{ message }} {{encod}}
             </div>
         {% endif %}
-        {% if columns %}
+        {% if columns or data %}
             <table border="1">
                 <tr>
                     {% for col in columns %}
