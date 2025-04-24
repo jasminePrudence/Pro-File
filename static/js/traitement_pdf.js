@@ -67,3 +67,5 @@ function desactiverRequired() {
 document.getElementById("moved_hidden").addEventListener("click", function() {
     document.getElementById("texte").removeAttribute("required");
 });
+
+

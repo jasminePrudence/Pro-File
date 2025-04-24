@@ -14,6 +14,8 @@ from PIL import Image
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from Crypto.Cipher import AES
+
 # from pdfminer.high_level import extract_text
 
 #Crée une instance de Flask
@@ -744,7 +746,6 @@ def modify_pdf():
                 added_filename=added_filename,
                 added_pdf_url=f"/view-pdf/{added_filename}"
             )
-
         return "Aucune modification n'a été effectuée.", 400
 
     except Exception as e:

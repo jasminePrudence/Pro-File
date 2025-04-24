@@ -80,6 +80,9 @@
                 <button type="submit" name="action" value="add_text">Ajouter du texte</button>
                 <hr class="divider" />
                 <p>Supprimer des pages d'un PDF</p>
+                {% if message_pdf %}
+                    <div id="error-message" style="background: red; color: white; padding: 10px; border-radius: 5px;">{{ message_pdf }}</div>
+                {% endif %}
                 <label for="pages">Numéros des pages à supprimer (ex: 1,3,5) :</label>
                 <input type="text" name="pages" placeholder="Ex: 1,3,5">
                 <button type="submit" name="action" value="delete_pages" id="moved_hidden">Supprimer des pages</button> 
